@@ -215,8 +215,8 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
     }
 }
 
-contract PepeAI is ERC20 {
-    constructor() ERC20("Token", "TK") {
+contract PeppaAI is ERC20 {
+    constructor() ERC20("PeppaAi", "PeppaAI") {
         _mint(msg.sender, 420_690000000000 * (10 ** 18));
     }
 }

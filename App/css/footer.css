@@ -1,0 +1,19 @@
+.footer{
+   background-color: #E69CC6;
+   padding: 21px 0;
+}
+
+.footer.spa{
+   position: fixed;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+}
+
+.footer-text{
+   font-weight: 400;
+   font-size: 16px;
+   line-height: 140%;
+   text-align: center;
+   color: #FFFFFF;
+}
