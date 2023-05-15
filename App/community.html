@@ -22,7 +22,7 @@
         <div class="sidebar-inner">
           <div class="sidebar-top">
             <div class="header-menu-items">
-              <a href="#" class="header-menu-item"
+              <a href="/" class="header-menu-item"
                 ><svg
                   width="28"
                   height="28"
@@ -37,7 +37,7 @@
                 </svg>
                 Home</a
               >
-              <a href="#" class="header-menu-item"
+              <a href="/staking" class="header-menu-item"
                 ><svg
                   width="28"
                   height="28"
@@ -52,7 +52,7 @@
                 </svg>
                 Staking</a
               >
-              <a href="#" class="header-menu-item"
+              <a href="/swap" class="header-menu-item"
                 ><svg
                   width="28"
                   height="28"
@@ -82,7 +82,7 @@
                 </svg>
                 Launchpad</a
               >
-              <a href="#" class="header-menu-item active"
+              <a href="/community" class="header-menu-item active"
                 ><svg
                   width="28"
                   height="28"
@@ -213,14 +213,20 @@
                       d="M40.7552 13.1533C40.7553 13.3248 40.7276 13.4945 40.6736 13.6529C40.6197 13.8113 40.5407 13.9553 40.4409 14.0765C40.3412 14.1978 40.2228 14.294 40.0925 14.3596C39.9622 14.4252 39.8225 14.459 39.6814 14.459C39.5404 14.459 39.4007 14.4252 39.2703 14.3596C39.14 14.294 39.0216 14.1978 38.9219 14.0765C38.8222 13.9553 38.7431 13.8113 38.6892 13.6529C38.6353 13.4945 38.6076 13.3248 38.6077 13.1533C38.6076 12.9819 38.6353 12.8122 38.6892 12.6537C38.7431 12.4953 38.8222 12.3514 38.9219 12.2301C39.0216 12.1089 39.14 12.0127 39.2703 11.9471C39.4007 11.8814 39.5404 11.8477 39.6814 11.8477C39.8225 11.8477 39.9622 11.8814 40.0925 11.9471C40.2228 12.0127 40.3412 12.1089 40.4409 12.2301C40.5407 12.3514 40.6197 12.4953 40.6736 12.6537C40.7276 12.8122 40.7553 12.9819 40.7552 13.1533Z"
                       fill="#D466A9"
                     />
-                    <path d="M31.4644 26.6338L32.6469 28.1351Z" fill="#E48ECE" />
+                    <path
+                      d="M31.4644 26.6338L32.6469 28.1351Z"
+                      fill="#E48ECE"
+                    />
                     <path
                       d="M31.4644 26.6338L32.6469 28.1351"
                       stroke="#EC8DC4"
                       stroke-width="2"
                       stroke-linecap="round"
                     />
-                    <path d="M32.7341 27.1667L30.4824 27.9988Z" fill="#E48ECE" />
+                    <path
+                      d="M32.7341 27.1667L30.4824 27.9988Z"
+                      fill="#E48ECE"
+                    />
                     <path
                       d="M32.7341 27.1667L30.4824 27.9988"
                       stroke="#EC8DC4"
@@ -345,7 +351,9 @@
                     <span>-NA-</span>
                   </div>
                 </div>
-                <a href="#" class="header-btn btn">Connect Wallet</a>
+                <a href="" class="header-btn btn" id="connect_button"
+                  >Connect Wallet</a
+                >
                 <div class="header-burger">
                   <div class="header-burger-inner">
                     <div class="header-burger-line"></div>
@@ -370,7 +378,9 @@
           <div class="community">
             <div class="community-inner">
               <div class="community-title">Community</div>
-              <div class="community-text">Stake PeppaAI to earn more PeppaAI</div>
+              <div class="community-text">
+                Stake PeppaAI to earn more PeppaAI
+              </div>
               <div class="community-items">
                 <div class="community-item">
                   <div class="community-item-l">
@@ -381,7 +391,9 @@
                   </div>
                   <div class="community-item-r">
                     <div class="community-item-title">Telegram</div>
-                    <div class="community-item-text">Join the community discussion on Telegram</div>
+                    <div class="community-item-text">
+                      Join the community discussion on Telegram
+                    </div>
                     <a
                       href="https://t.me/PepeAi_Official_Group"
                       class="community-item-link"
@@ -419,7 +431,9 @@
                   </div>
                   <div class="community-item-r">
                     <div class="community-item-title">Twitter</div>
-                    <div class="community-item-text">Follow Pepe Ai on Twitter</div>
+                    <div class="community-item-text">
+                      Follow Pepe Ai on Twitter
+                    </div>
                     <a
                       href="https://t.me/PepeAi_Official_Group"
                       class="community-item-link"
@@ -437,7 +451,9 @@
                   </div>
                   <div class="community-item-r">
                     <div class="community-item-title">Medium</div>
-                    <div class="community-item-text">Read more about Pepe Ai on Medium</div>
+                    <div class="community-item-text">
+                      Read more about Pepe Ai on Medium
+                    </div>
                     <a
                       href="https://t.me/PepeAi_Official_Group"
                       class="community-item-link"
@@ -622,5 +638,7 @@
     <script src="libs/jquery/jquery.maskedinput.min.js"></script>
     <script src="libs/swiper/swiper-bundle.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="./js/ConnectWallet.js"></script>
   </body>
 </html>
