@@ -332,28 +332,28 @@
                 <div class="header-items">
                   <div class="header-item">
                     <span>Portfolio:</span>
-                    <span>-NA-</span>
+                    <span id="tokenBalance">-NA-</span>
                   </div>
                   <div class="header-item active">
-                    <span>Highest APY:</span>
-                    <span>-NA-</span>
+                    <span>HighestAPY:</span>
+                    <span id="highApy">1% per day</span>
                   </div>
                   <div class="header-item">
                     <span>Peppa AI:</span>
-                    <span>-NA-</span>
+                    <span>1 $</span>
                   </div>
                   <div class="header-item">
                     <span>BNB:</span>
-                    <span>-NA-</span>
+                    <span id="bnbPrice">-NA-</span>
                   </div>
                   <div class="header-item">
                     <span>ETH:</span>
-                    <span>-NA-</span>
+                    <span id="ethPrice">-NA-</span>
                   </div>
                 </div>
-                <a href="" class="header-btn btn" id="connect_button"
-                  >Connect Wallet</a
-                >
+                <button class="header-btn btn" id="connect_button">
+                  Connect Wallet
+                </button>
                 <div class="header-burger">
                   <div class="header-burger-inner">
                     <div class="header-burger-line"></div>
@@ -424,14 +424,14 @@
                     </div>
                     <div class="staking-item-center-row">
                       <span>Total Staked</span>
-                      <span>10,283.9043</span>
+                      <span id="totalStake">-NA-</span>
                     </div>
                   </div>
                   <div class="staking-item-bottom">
                     <div class="staking-item-bottom-row">
                       <div class="staking-item-bottom-row-l">
                         <p>Earned:</p>
-                        <p>0.000</p>
+                        <p id="earnedPeppa">-NA-</p>
                       </div>
                       <div class="staking-item-bottom-row-r">
                         <div class="staking-item-bottom-row-btn btn purple">
@@ -441,12 +441,12 @@
                     </div>
                     <div class="staking-item-bottom-row">
                       <div class="staking-item-bottom-row-l">
-                        <p>OURO Staked:</p>
-                        <p>0.000</p>
+                        <p>PeppaAI Staked:</p>
+                        <p id="peppaStaked">-NA-</p>
                       </div>
                       <div class="staking-item-bottom-row-r">
                         <div class="staking-item-bottom-row-mint">
-                          Mint Ouro
+                          Mint PeppaAI
                         </div>
                       </div>
                     </div>
@@ -842,7 +842,7 @@
           <div class="staking-pool-item">
             <div class="staking-pool-item-top">
               <p>Stake</p>
-              <p>Balance <span>0.0000</span></p>
+              <p>Balance <span id="balanceUser">-NA-</span></p>
             </div>
             <div class="staking-pool-item-bottom">
               <div class="staking-pool-item-bottom-l">
@@ -853,7 +853,12 @@
               </div>
               <div class="staking-pool-item-bottom-r">
                 <div class="staking-pool-item-field">
-                  <input type="text" placeholder="0.0000" value="0.0000" />
+                  <input
+                    type="text"
+                    id="myInputStake"
+                    placeholder="0"
+                    value="0"
+                  />
                 </div>
               </div>
             </div>
@@ -883,7 +888,7 @@
           <div class="staking-pool-item">
             <div class="staking-pool-item-top">
               <p>Unstake</p>
-              <p>Balance <span>0.0000</span></p>
+              <p>Balance <span id="unstakeBalance">-NA-</span></p>
             </div>
             <div class="staking-pool-item-bottom">
               <div class="staking-pool-item-bottom-l">
@@ -894,7 +899,12 @@
               </div>
               <div class="staking-pool-item-bottom-r">
                 <div class="staking-pool-item-field">
-                  <input type="text" placeholder="0.0000" value="0.0000" />
+                  <input
+                    type="text"
+                    id="myInputUnstake"
+                    placeholder="0"
+                    value="0"
+                  />
                 </div>
               </div>
             </div>
@@ -921,16 +931,18 @@
             ></div>
           </div>
           <div class="staking-pool-range-values">
-            <div class="staking-pool-range-value">0%</div>
-            <div class="staking-pool-range-value">25%</div>
-            <div class="staking-pool-range-value">50%</div>
-            <div class="staking-pool-range-value">75%</div>
-            <div class="staking-pool-range-value">100%</div>
+            <div class="staking-pool-range-value" id="0procent">0%</div>
+            <div class="staking-pool-range-value" id="25procent">25%</div>
+            <div class="staking-pool-range-value" id="50procent">50%</div>
+            <div class="staking-pool-range-value" id="75procent">75%</div>
+            <div class="staking-pool-range-value" id="100procent">100%</div>
           </div>
         </div>
         <div class="staking-pool-btns">
-          <div class="staking-pool-btn btn">Cancel</div>
-          <div class="staking-pool-btn btn purple">Confirm</div>
+          <div class="staking-pool-btn btn" id="cancelButton">Cancel</div>
+          <div class="staking-pool-btn btn purple" id="confirmButton">
+            Confirm
+          </div>
         </div>
       </div>
     </div>
@@ -941,5 +953,7 @@
     <script src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="./js/ConnectWallet.js"></script>
+    <script src="./js/PriceAndPortfolio.js"></script>
+    <script src="./js/Staking.js"></script>
   </body>
 </html>

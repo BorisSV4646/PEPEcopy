@@ -7,7 +7,7 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const ERC20 = await ethers.getContractFactory("PeppaAi", deployer);
+  const ERC20 = await ethers.getContractFactory("PeppaAI", deployer);
 
   const TokenERC20 = await ERC20.deploy();
 

@@ -26,6 +26,7 @@ contract ERC20Stakeable is ReentrancyGuard {
     uint256 public minStake = 1 * 10 ** 18;
     uint256 private maxRewardDay;
     uint256 private dayTime;
+    uint256 public totalStaked;
 
     mapping(address => Staker) internal stakers;
 
@@ -72,11 +73,13 @@ contract ERC20Stakeable is ReentrancyGuard {
             stakers[msg.sender].timeOfLastUpdate = block.timestamp;
             stakers[msg.sender].unclaimedRewards = 0;
             stakers[msg.sender].startStaking = block.timestamp;
+            totalStaked += _amount;
         } else {
             uint256 rewards = calculateRewards(msg.sender);
             stakers[msg.sender].unclaimedRewards += rewards;
             stakers[msg.sender].deposited += _amount;
             stakers[msg.sender].timeOfLastUpdate = block.timestamp;
+            totalStaked += _amount;
             // stakers[msg.sender].startStaking = block.timestamp;
         }
 
@@ -122,6 +125,8 @@ contract ERC20Stakeable is ReentrancyGuard {
 
         rewardsToken.transfer(msg.sender, amounwithdraw - comission);
 
+        totalStaked -= amounwithdraw;
+
         emit Withdraw(msg.sender, amounwithdraw);
     }
 
@@ -147,6 +152,8 @@ contract ERC20Stakeable is ReentrancyGuard {
         }
 
         rewardsToken.transfer(msg.sender, amounwithdraw - comission);
+
+        totalStaked -= amounwithdraw;
 
         emit Withdraw(msg.sender, amounwithdraw);
     }

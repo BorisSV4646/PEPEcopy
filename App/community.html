@@ -332,28 +332,28 @@
                 <div class="header-items">
                   <div class="header-item">
                     <span>Portfolio:</span>
-                    <span>-NA-</span>
+                    <span id="tokenBalance">-NA-</span>
                   </div>
                   <div class="header-item active">
-                    <span>Highest APY:</span>
-                    <span>-NA-</span>
+                    <span>HighestAPY:</span>
+                    <span id="highApy">1% per day</span>
                   </div>
                   <div class="header-item">
                     <span>Peppa AI:</span>
-                    <span>-NA-</span>
+                    <span>1 $</span>
                   </div>
                   <div class="header-item">
                     <span>BNB:</span>
-                    <span>-NA-</span>
+                    <span id="bnbPrice">-NA-</span>
                   </div>
                   <div class="header-item">
                     <span>ETH:</span>
-                    <span>-NA-</span>
+                    <span id="ethPrice">-NA-</span>
                   </div>
                 </div>
-                <a href="" class="header-btn btn" id="connect_button"
-                  >Connect Wallet</a
-                >
+                <button class="header-btn btn" id="connect_button">
+                  Connect Wallet
+                </button>
                 <div class="header-burger">
                   <div class="header-burger-inner">
                     <div class="header-burger-line"></div>
@@ -640,5 +640,6 @@
     <script src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="./js/ConnectWallet.js"></script>
+    <script src="./js/PriceAndPortfolio.js"></script>
   </body>
 </html>
