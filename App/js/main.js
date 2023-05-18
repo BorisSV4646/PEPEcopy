@@ -142,7 +142,27 @@ $(document).ready(function () {
       }, 1);
     });
 
+    $("#unstakeButton").click(function () {
+      $(".staking-pool-wrapper").addClass("active");
+      setTimeout(function () {
+        $(".staking-pool-bg").addClass("active");
+        $(".staking-pool-block").addClass("active");
+      }, 1);
+    });
+
     $(".staking-pool-bg, .staking-pool-close").click(function () {
+      selector1.style.left = 0 + "%";
+      rangeLine1.style.width = 0 + "%";
+      selector2.style.left = 0 + "%";
+      rangeLine2.style.width = 0 + "%";
+      $(".staking-pool-bg").removeClass("active");
+      $(".staking-pool-block").removeClass("active");
+      setTimeout(function () {
+        $(".staking-pool-wrapper").removeClass("active");
+      }, 1);
+    });
+
+    $("#cancelButton").click(function () {
       selector1.style.left = 0 + "%";
       rangeLine1.style.width = 0 + "%";
       selector2.style.left = 0 + "%";

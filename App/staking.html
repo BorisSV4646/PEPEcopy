@@ -434,7 +434,10 @@
                         <p id="earnedPeppa">-NA-</p>
                       </div>
                       <div class="staking-item-bottom-row-r">
-                        <div class="staking-item-bottom-row-btn btn purple">
+                        <div
+                          class="staking-item-bottom-row-btn btn purple"
+                          id="harvest"
+                        >
                           Harvest
                         </div>
                       </div>
@@ -444,15 +447,17 @@
                         <p>PeppaAI Staked:</p>
                         <p id="peppaStaked">-NA-</p>
                       </div>
-                      <div class="staking-item-bottom-row-r">
+                      <!-- <div class="staking-item-bottom-row-r">
                         <div class="staking-item-bottom-row-mint">
                           Mint PeppaAI
                         </div>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                   <div class="staking-item-btns">
-                    <div class="staking-item-btn btn">Unstake</div>
+                    <div class="staking-item-btn btn" id="unstakeButton">
+                      Unstake
+                    </div>
                     <div
                       class="staking-item-btn btn purple staking-item-btn-stake"
                     >
@@ -869,7 +874,7 @@
               type="range"
               min="0"
               max="100"
-              step="1"
+              step="25"
               value="0"
               id="slider1"
             />
@@ -915,7 +920,7 @@
               type="range"
               min="0"
               max="100"
-              step="1"
+              step="25"
               value="0"
               id="slider2"
             />

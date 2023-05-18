@@ -1,3 +1,50 @@
+const slider = document.getElementById("slider1");
+const inputField = document.getElementById("myInputStake");
+const slider2 = document.getElementById("slider2");
+const inputField2 = document.getElementById("myInputUnstake");
+const rangeValues = document.querySelectorAll(".staking-pool-range-value");
+
+slider.addEventListener("input", async function () {
+  const tokenContract = await getTokenContract(
+    "https://data-seed-prebsc-1-s1.binance.org:8545"
+  );
+  const waleetAdress = await getWallet();
+
+  const balance = await tokenContract.methods.balanceOf(waleetAdress).call();
+
+  const selectedValue = parseInt(this.value);
+
+  let result = ((balance / 10 ** 18) * selectedValue) / 100;
+
+  inputField.value = result;
+});
+
+slider2.addEventListener("input", async function () {
+  const stakeContract = await getContract(
+    "https://data-seed-prebsc-1-s1.binance.org:8545"
+  );
+  const waleetAdress = await getWallet();
+  const balanceStakingUser = await stakeContract.methods
+    .getDepositInfo(waleetAdress)
+    .call();
+  const balanceStake = balanceStakingUser["_stake"];
+
+  const selectedValue = parseInt(this.value);
+
+  let result = ((balanceStake / 10 ** 18) * selectedValue) / 100;
+
+  inputField2.value = result;
+
+  //   rangeValues.forEach(function (rangeValue) {
+  //     const value = parseInt(rangeValue.textContent);
+  //     if (value <= selectedValue) {
+  //       rangeValue.classList.add("active");
+  //     } else {
+  //       rangeValue.classList.remove("active");
+  //     }
+  //   });
+});
+
 async function getWallet() {
   if (typeof web3 !== "undefined") {
     web3 = new Web3(window.ethereum);
@@ -378,14 +425,15 @@ async function getStaking() {
       .call();
 
     const allStaking = document.getElementById("totalStake");
-    allStaking.innerHTML = `${balanceAll / 10 ** 18}`;
+    const allStakingFinal = balanceAll / 10 ** 18;
+    allStaking.innerHTML = `${allStakingFinal.toFixed(1)}`;
 
     const singleStake = document.getElementById("peppaStaked");
     singleStake.innerHTML = `${balanceStakingUser["_stake"] / 10 ** 18}`;
 
     const eranedFinal = balanceStakingUser["_rewards"] / 10 ** 18;
     const earnedPeppa = document.getElementById("earnedPeppa");
-    earnedPeppa.innerHTML = `${eranedFinal.toFixed(5)}`;
+    earnedPeppa.innerHTML = `${eranedFinal.toFixed(2)}`;
 
     const unstakeBalance = document.getElementById("unstakeBalance");
     unstakeBalance.innerHTML = `${balanceStakingUser["_stake"] / 10 ** 18}`;
@@ -398,18 +446,20 @@ getStaking();
 
 const myInputStake = document.getElementById("myInputStake");
 const myInputUnstake = document.getElementById("myInputUnstake");
-const confirmButton = document.getElementById("confirmButton");
+const harvestmButton = document.getElementById("harvest");
+harvestmButton.addEventListener("click", claimReward);
 
-let stakingPoolContent = document.querySelector(".staking-pool-content");
+$("#confirmButton").click(function () {
+  var activeTab = $(".staking-pool-content.active").attr("data-tab");
 
-if (stakingPoolContent.getAttribute("data-tab") === "1") {
-  confirmButton.addEventListener("click", stakingFunction);
-} else {
-  confirmButton.addEventListener("click", unstakingFunction);
-}
+  if (activeTab === "1") {
+    stakingFunction();
+  } else if (activeTab === "2") {
+    unstakingFunction();
+  }
+});
 
 async function stakingFunction() {
-  //   const web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545");
   const stakeContract = await getContract(window.ethereum);
   const tokenContract = await getTokenContract(window.ethereum);
   const waleetAdress = await getWallet();
@@ -420,12 +470,12 @@ async function stakingFunction() {
 
   const finalvalue = value * 10 ** 18;
 
-  if (value > 0 && value <= userBalance) {
+  if (value > 0 && finalvalue <= userBalance) {
     try {
       const allowanceFirst = await tokenContract.methods
         .allowance(waleetAdress, stakeContract.options.address)
         .call();
-      if (allowanceFirst >= value) {
+      if (allowanceFirst >= finalvalue) {
         await stakeContract.methods
           .deposit(finalvalue.toString())
           .send({ from: waleetAdress });
@@ -436,7 +486,7 @@ async function stakingFunction() {
         const allowanceSecond = await tokenContract.methods
           .allowance(waleetAdress, stakeContract.options.address)
           .call();
-        if (allowanceSecond >= value && allowanceFirst < value) {
+        if (allowanceSecond >= finalvalue && allowanceFirst < finalvalue) {
           await stakeContract.methods
             .deposit(finalvalue.toString())
             .send({ from: waleetAdress });
@@ -458,17 +508,100 @@ async function stakingFunction() {
 }
 
 async function unstakingFunction() {
-  const balance = getTokenBalance();
+  const stakeContract = await getContract(window.ethereum);
+  const tokenContract = await getTokenContract(window.ethereum);
+  const waleetAdress = await getWallet();
+  const balanceStakingUser = await stakeContract.methods
+    .getDepositInfo(waleetAdress)
+    .call();
+  const userBalance = balanceStakingUser["_stake"];
+  const value = parseFloat(myInputUnstake.value);
 
-  const valueStake = myInputStake.value;
-  const valueUnstake = myInputUnstake.value;
+  console.log(userBalance);
 
-  // если сумма вывода равна балансу стейкинга вызвать функцию вывести все, в противном случае просто функция вывод
+  const finalvalue = value * 10 ** 18;
+
+  if (value > 0 && finalvalue <= userBalance && finalvalue !== userBalance) {
+    try {
+      const allowanceFirst = await tokenContract.methods
+        .allowance(waleetAdress, stakeContract.options.address)
+        .call();
+      if (allowanceFirst >= value) {
+        await stakeContract.methods
+          .withdraw(finalvalue.toString())
+          .send({ from: waleetAdress });
+      } else {
+        await tokenContract.methods
+          .approve(stakeContract.options.address, value)
+          .send({ from: waleetAdress });
+        const allowanceSecond = await tokenContract.methods
+          .allowance(waleetAdress, stakeContract.options.address)
+          .call();
+        if (allowanceSecond >= value && allowanceFirst < value) {
+          await stakeContract.methods
+            .withdraw(finalvalue.toString())
+            .send({ from: waleetAdress });
+        } else if (allowanceSecond < value) {
+          alert(
+            "Вы не обобрили нужное колличество токенов, введите в поле необходимое колличество для стейкинга"
+          );
+          await tokenContract.methods
+            .approve(stakeContract.options.address, value)
+            .send({ from: waleetAdress });
+        }
+      }
+    } catch (error) {
+      console.error("Ошибка:", error);
+    }
+  } else if (finalvalue === userBalance) {
+    try {
+      const allowanceFirst = await tokenContract.methods
+        .allowance(waleetAdress, stakeContract.options.address)
+        .call();
+      if (allowanceFirst >= value) {
+        await stakeContract.methods.withdrawAll().send({ from: waleetAdress });
+      } else {
+        await tokenContract.methods
+          .approve(stakeContract.options.address, value)
+          .send({ from: waleetAdress });
+        const allowanceSecond = await tokenContract.methods
+          .allowance(waleetAdress, stakeContract.options.address)
+          .call();
+        if (allowanceSecond >= value && allowanceFirst < value) {
+          await stakeContract.methods
+            .withdrawAll()
+            .send({ from: waleetAdress });
+        } else if (allowanceSecond < value) {
+          alert(
+            "Вы не обобрили нужное колличество токенов, введите в поле необходимое колличество для стейкинга"
+          );
+          await tokenContract.methods
+            .approve(stakeContract.options.address, value)
+            .send({ from: waleetAdress });
+        }
+      }
+    } catch (error) {
+      console.error("Ошибка:", error);
+    }
+  } else {
+    alert("Введите значение больше 0 и не больше вашего баланса токенов");
+  }
 }
 
 async function claimReward() {
-  const balance = getTokenBalance();
+  const stakeContract = await getContract(window.ethereum);
+  const tokenContract = await getTokenContract(window.ethereum);
+  const waleetAdress = await getWallet();
 
-  const valueStake = myInputStake.value;
-  const valueUnstake = myInputUnstake.value;
+  const userReward = await stakeContract.methods
+    .getDepositInfo(waleetAdress)
+    .call();
+
+  const claimRewards = userReward["_rewards"];
+
+  if (claimRewards !== 0) {
+    await stakeContract.methods.claimRewards().send({ from: waleetAdress });
+  } else {
+    alert("У вас нет ревардов");
+  }
 }

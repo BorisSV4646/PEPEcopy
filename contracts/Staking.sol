@@ -117,7 +117,7 @@ contract ERC20Stakeable is ReentrancyGuard {
         uint256 comission;
 
         if (stakers[msg.sender].startStaking + 30 days >= block.timestamp) {
-            comission = (10 * rewards) / 100;
+            comission = (10 * _amount) / 100;
             rewardsToken.transfer(burnable, comission);
         } else {
             comission = 0;
@@ -145,7 +145,7 @@ contract ERC20Stakeable is ReentrancyGuard {
         uint256 comission;
 
         if (stakers[msg.sender].startStaking + 30 days >= block.timestamp) {
-            comission = (10 * rewards) / 100;
+            comission = (10 * _deposit) / 100;
             rewardsToken.transfer(burnable, comission);
         } else {
             comission = 0;
