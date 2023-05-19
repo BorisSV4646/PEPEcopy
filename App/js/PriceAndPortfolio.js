@@ -48,8 +48,8 @@ async function getWallet() {
 }
 
 async function getTokenBalance() {
-  const web3 = new Web3("https://bsc-dataseed1.binance.org");
-  const tokenContractAddress = "0xe732d2dAC6aA6a947774d9b6FBBc15910115B9FD";
+  const web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545");
+  const tokenContractAddress = "0x45D283fD00C0cBEcE8D44a273410891492de3F88";
   const wallets = await web3.eth.getAccounts();
   const waleetAdress = await getWallet();
 
@@ -89,12 +89,7 @@ async function getTokenBalance() {
           name: "from",
           type: "address",
         },
-        {
-          indexed: true,
-          internalType: "address",
-          name: "to",
-          type: "address",
-        },
+        { indexed: true, internalType: "address", name: "to", type: "address" },
         {
           indexed: false,
           internalType: "uint256",
@@ -142,11 +137,7 @@ async function getTokenBalance() {
     {
       inputs: [
         { internalType: "address", name: "spender", type: "address" },
-        {
-          internalType: "uint256",
-          name: "subtractedValue",
-          type: "uint256",
-        },
+        { internalType: "uint256", name: "subtractedValue", type: "uint256" },
       ],
       name: "decreaseAllowance",
       outputs: [{ internalType: "bool", name: "", type: "bool" }],
@@ -214,9 +205,18 @@ async function getTokenBalance() {
 
   try {
     const balance = await tokenContract.methods.balanceOf(waleetAdress).call();
+    const balanceFinal = balance / 10 ** 18;
+    const balanceFinalString = balanceFinal.toString();
+    const balanceFinalLength = balanceFinalString.length;
 
     const tokenElement = document.getElementById("tokenBalance");
-    tokenElement.innerHTML = `${balance} PeppaAI`;
+    if (balanceFinalLength > 12) {
+      tokenElement.innerHTML = `${balance.substring(0, 4)}...${balance.slice(
+        -4
+      )} PeppaAI`;
+    } else {
+      tokenElement.innerHTML = `${balanceFinal} PeppaAI`;
+    }
   } catch (error) {
     console.error("Ошибка при получении баланса токенов:", error);
   }
