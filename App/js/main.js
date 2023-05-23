@@ -1,3 +1,154 @@
+// import { swapBnbToEth, swapEthToBnb } from "./Swap.js";
+const {
+  ChainId,
+  Token,
+  Route,
+  Fetcher,
+  WBNB,
+  WETH9,
+  Trade,
+  TradeType,
+  Percent,
+  CurrencyAmount,
+} = require("@pancakeswap/sdk");
+const { ethers } = require("ethers");
+const { getDefaultProvider } = require("ethers");
+const provider = getDefaultProvider("https://1rpc.io/bnb");
+const chainId = ChainId.BSC;
+
+const swapEthToBnb = async (value) => {
+  const wbnb = WBNB[chainId];
+  const weth = WETH9[chainId];
+
+  const pair = await Fetcher.fetchPairData(weth, wbnb, provider);
+
+  const route = new Route([pair], weth, wbnb);
+  const amountOut = value * 10 ** 18;
+  const amount = CurrencyAmount.fromRawAmount(weth, amountOut);
+  const trade = new Trade(route, amount, TradeType.EXACT_INPUT);
+  const howMuchBNB = route.midPrice.toSignificant(6);
+  console.log(howMuchBNB);
+  console.log(route.midPrice.invert().toSignificant(6));
+  console.log(trade.executionPrice.toSignificant(6));
+  // console.log(trade.nextMidPrice.toSignificant(6));
+
+  const slippageTolerance = new Percent("50", "10000");
+  const amountIn = trade.maximumAmountIn(slippageTolerance);
+  const amountOutMin = trade.minimumAmountOut(slippageTolerance);
+  const path = [weth.address, wbnb.address];
+  const to = "";
+  const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+  // const value = trade.inputAmount.raw;
+
+  console.log(amountOutMin.toExact());
+  console.log(amountIn.toExact());
+  return {
+    howMuchBNB: howMuchBNB,
+    path: path,
+    deadline: deadline,
+    amountIn: amountIn.toExact(),
+    amountOutMin: amountOutMin.toExact(),
+  };
+};
+
+// const swapBnbToEth = async (value) => {
+//   const wbnb = WBNB[chainId];
+//   const weth = WETH9[chainId];
+
+//   const pair = await Fetcher.fetchPairData(wbnb, weth, provider);
+
+//   const route = new Route([pair], wbnb, weth);
+//   const amountOut = value * 10 ** 18;
+//   const amount = CurrencyAmount.fromRawAmount(wbnb, amountOut);
+//   const trade = new Trade(route, amount, TradeType.EXACT_INPUT);
+//   const howMuchETH = route.midPrice.toSignificant(6);
+//   console.log(howMuchETH);
+//   console.log(route.midPrice.invert().toSignificant(6));
+//   console.log(trade.executionPrice.toSignificant(6));
+//   // console.log(trade.nextMidPrice.toSignificant(6));
+
+//   const slippageTolerance = new Percent("50", "10000");
+//   const amountIn = trade.maximumAmountIn(slippageTolerance);
+//   const amountOutMin = trade.minimumAmountOut(slippageTolerance);
+//   const path = [wbnb.address, weth.address];
+//   const to = "";
+//   const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+//   // const value = trade.inputAmount.raw;
+
+//   console.log(amountOutMin.toExact());
+//   console.log(amountIn.toExact());
+
+//   return howMuchETH;
+// };
+
+async function swapEthToBnbTransaction() {
+  const web3 = new Web3(window.ethereum);
+  const walletAdress = await getWallet();
+
+  const uniContractRouterAdress = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+  const uniContractRouterABI = [
+    {
+      constant: false,
+      inputs: [
+        {
+          name: "amountOutMin",
+          type: "uint256",
+        },
+        {
+          name: "path",
+          type: "address[]",
+        },
+        {
+          name: "to",
+          type: "address",
+        },
+        {
+          name: "deadline",
+          type: "uint256",
+        },
+      ],
+      name: "swapExactETHForTokens",
+      outputs: [
+        {
+          name: "amounts",
+          type: "uint256[]",
+        },
+      ],
+      payable: true,
+      stateMutability: "payable",
+      type: "function",
+    },
+  ];
+
+  const tuniContract = new web3.eth.Contract(
+    uniContractRouterABI,
+    uniContractRouterAdress
+  );
+
+  const value = parseFloat(inputSwap.value);
+  const { howMuchBNB, path, deadline, amountIn, amountOutMin } =
+    await swapEthToBnb(value);
+  const deadlineSwap = deadline;
+  const pathSwap = path;
+  const amountOutMinSwap = amountOutMin;
+  await tuniContract.methods
+    .swapExactETHForTokens(
+      amountOutMinSwap,
+      pathSwap,
+      walletAdress,
+      deadlineSwap
+    )
+    .send({
+      from: walletAdress,
+      value: ethers.utils.parseEther(value.toString()),
+    });
+}
+
+const swapButton = document.getElementById("swapButton");
+
+const inputSwap = document.getElementById("inputSwap");
+const outputSwap = document.getElementById("outputSwap");
+
 async function getWallet() {
   if (typeof web3 !== "undefined") {
     web3 = new Web3(window.ethereum);
@@ -221,7 +372,15 @@ $(document).ready(function () {
         .find("#toText")
         .prepend(`<img src="img/swap-block-item-1.png" alt="">`);
       getPriceEth("changePrice");
+      swapButton.addEventListener("click", swapEthToBnbTransaction);
       getTokenBalanceETH();
+      inputElement.addEventListener("input", async function (event) {
+        const value = parseFloat(inputSwap.value);
+        const { howMuchBNB, path, deadline, amountIn, amountOutMin } =
+          await swapEthToBnb(value);
+        const finalValue = value * howMuchBNB;
+        outputSwap.value = finalValue.toFixed(2);
+      });
     } else {
       $(".swap-block-item-selector").find("#toText").text("");
       $(".swap-block-item-selector")
@@ -232,6 +391,15 @@ $(document).ready(function () {
         .prepend(`<img src="img/swap-block-item-0.png" alt="">`);
       getPriceBnb("changePrice");
       getTokenBalanceBNB();
+      inputElement.addEventListener("input", async function (event) {
+        const value = parseFloat(inputSwap.value);
+        const { howMuchBNB, path, deadline, amountIn, amountOutMin } =
+          await swapEthToBnb(value);
+        console.log(howMuchBNB);
+        const finalValue = value * howMuchBNB;
+        console.log(finalValue);
+        outputSwap.value = finalValue.toFixed(2);
+      });
     }
     $(".swap-tokens-bg").removeClass("active");
     $(".swap-tokens-block").removeClass("active");
@@ -335,3 +503,5 @@ $(document).ready(function () {
     });
   }
 });
+
+const inputElement = document.getElementById("inputSwap");

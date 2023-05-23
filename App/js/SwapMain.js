@@ -25,7 +25,7 @@ const tokenAddressDai = "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3";
 const tokenAddressBnb = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
 
 const swapButton = document.getElementById("swapButton");
-swapButton.addEventListener("click", swap);
+swapButton.addEventListener("click", swapEthToBnb);
 
 async function swapEthToBnb() {
   const web3 = new Web3(window.ethereum);

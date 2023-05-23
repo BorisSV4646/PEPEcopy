@@ -1,9 +1,9 @@
 const path = require("path");
 const express = require("express");
+const mime = require("mime");
 const app = express();
 
 const a = app.use(express.static(path.join(__dirname)));
-console.log(path.join(__dirname));
 
 app.get("/", (req, res) => {
   res.sendFile(`${__dirname}/index2.html`);

@@ -336,7 +336,7 @@
                   </div>
                   <div class="header-item active">
                     <span>HighestAPY:</span>
-                    <span id="highApy">1% per day</span>
+                    <span id="highApy">365%</span>
                   </div>
                   <div class="header-item">
                     <span>Peppa AI:</span>
@@ -418,7 +418,12 @@
                         </div>
                       </div>
                       <div class="swap-block-item-field">
-                        <input type="text" placeholder="0" value="0" />
+                        <input
+                          type="text"
+                          id="inputSwap"
+                          placeholder="0"
+                          value="0"
+                        />
                       </div>
                     </div>
                   </div>
@@ -470,7 +475,12 @@
                         </div>
                       </div>
                       <div class="swap-block-item-field">
-                        <input type="text" placeholder="0" value="0" />
+                        <input
+                          type="text"
+                          id="outputSwap"
+                          placeholder="0"
+                          value="0"
+                        />
                       </div>
                     </div>
                   </div>
@@ -737,10 +747,12 @@
     <script src="libs/jquery/jquery-3.6.0.min.js"></script>
     <script src="libs/jquery/jquery.maskedinput.min.js"></script>
     <script src="libs/swiper/swiper-bundle.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="./js/output.js"></script>
+
+    <!-- <script type="module" src="js/main.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="./js/ConnectWallet.js"></script>
     <script src="./js/PriceAndPortfolio.js"></script>
-    <script src="./js/SwapMain.js"></script>
+    <!-- <script src="./js/SwapMain.js"></script> -->
   </body>
 </html>
