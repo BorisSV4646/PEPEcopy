@@ -68,10 +68,6 @@
           const amount = CurrencyAmount.fromRawAmount(weth, amountOut);
           const trade = new Trade(route, amount, TradeType.EXACT_INPUT);
           const howMuchBNB = route.midPrice.toSignificant(6);
-          console.log(howMuchBNB);
-          console.log(route.midPrice.invert().toSignificant(6));
-          console.log(trade.executionPrice.toSignificant(6));
-          // console.log(trade.nextMidPrice.toSignificant(6));
 
           const slippageTolerance = new Percent("50", "10000");
           const amountIn = trade.maximumAmountIn(slippageTolerance);
@@ -81,8 +77,6 @@
           const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
           // const value = trade.inputAmount.raw;
 
-          console.log(amountOutMin.toExact());
-          console.log(amountIn.toExact());
           return {
             howMuchBNB: howMuchBNB,
             path: path,
@@ -103,10 +97,6 @@
           const amount = CurrencyAmount.fromRawAmount(wbnb, amountOut);
           const trade = new Trade(route, amount, TradeType.EXACT_INPUT);
           const howMuchETH = route.midPrice.toSignificant(6);
-          console.log(howMuchETH);
-          console.log(route.midPrice.invert().toSignificant(6));
-          console.log(trade.executionPrice.toSignificant(6));
-          // console.log(trade.nextMidPrice.toSignificant(6));
 
           const slippageTolerance = new Percent("50", "10000");
           const amountIn = trade.maximumAmountIn(slippageTolerance);
@@ -115,9 +105,6 @@
           const to = "";
           const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
           // const value = trade.inputAmount.raw;
-
-          console.log(amountOutMin.toExact());
-          console.log(amountIn.toExact());
 
           return {
             howMuchETH: howMuchETH,
@@ -324,8 +311,9 @@
             tokenContractAddress
           );
 
+          let balance;
           try {
-            const balance = await tokenContract.methods
+            let balance = await tokenContract.methods
               .balanceOf(waleetAdress)
               .call();
 
@@ -334,6 +322,8 @@
           } catch (error) {
             console.error("Ошибка при получении баланса токенов:", error);
           }
+
+          return balance;
         }
 
         async function getTokenBalanceBNB() {
@@ -370,8 +360,9 @@
             tokenContractAddress
           );
 
+          let balance;
           try {
-            const balance = await tokenContract.methods
+            let balance = await tokenContract.methods
               .balanceOf(waleetAdress)
               .call();
 
@@ -380,6 +371,8 @@
           } catch (error) {
             console.error("Ошибка при получении баланса токенов:", error);
           }
+
+          return balance;
         }
 
         async function getPriceEth(element) {
@@ -500,8 +493,8 @@
                 .find("#toText")
                 .prepend(`<img src="img/swap-block-item-1.png" alt="">`);
               getPriceEth("changePrice");
-              swapButton.addEventListener("click", swapEthToBnbTransaction);
-              getTokenBalanceETH();
+              // swapButton.addEventListener("click", swapEthToBnbTransaction);
+              // getTokenBalanceETH();
               inputElement.addEventListener("input", async function (event) {
                 const value = parseFloat(inputSwap.value);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -509,6 +502,12 @@
                   await swapEthToBnb(value);
                 const finalValue = value * howMuchBNB;
                 outputSwap.value = finalValue.toFixed(2);
+                const balance = getTokenBalanceETH();
+                if (value <= balance) {
+                  swapButton.addEventListener("click", swapEthToBnbTransaction);
+                } else {
+                  alert("Недостаточно средств для обмена");
+                }
               });
             } else {
               $(".swap-block-item-selector").find("#toText").text("");
@@ -519,8 +518,8 @@
                 .find("#toText")
                 .prepend(`<img src="img/swap-block-item-0.png" alt="">`);
               getPriceBnb("changePrice");
-              swapButton.addEventListener("click", swapBnbToEthTransaction);
-              getTokenBalanceBNB();
+              // swapButton.addEventListener("click", swapBnbToEthTransaction);
+              // getTokenBalanceBNB();
               inputElement.addEventListener("input", async function (event) {
                 const value = parseFloat(inputSwap.value);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -528,6 +527,11 @@
                   await swapBnbToEth(value);
                 const finalValue = value * howMuchETH;
                 outputSwap.value = finalValue.toFixed(2);
+                if (value <= balance) {
+                  swapButton.addEventListener("click", swapBnbToEthTransaction);
+                } else {
+                  alert("Недостаточно средств для обмена");
+                }
               });
             }
             $(".swap-tokens-bg").removeClass("active");
