@@ -39,13 +39,13 @@
   {
     1: [
       function (require, module, exports) {
-        // import { swapBnbToEth, swapEthToBnb } from "./Swap.js";
+        // import { swapBnbToEth, swapEthToUni } from "./Swap.js";
         const {
           ChainId,
           Token,
           Route,
           Fetcher,
-          WBNB,
+          uni,
           WETH9,
           Trade,
           TradeType,
@@ -54,16 +54,24 @@
         } = require("@pancakeswap/sdk");
         const { ethers } = require("ethers");
         const { getDefaultProvider } = require("ethers");
-        const provider = getDefaultProvider("https://1rpc.io/bnb");
-        const chainId = ChainId.BSC;
+        const provider = getDefaultProvider(
+          "https://ethereum-goerli.publicnode.com"
+        );
+        const chainId = ChainId.GOERLI;
 
-        const swapEthToBnb = async (value) => {
-          const wbnb = WBNB[chainId];
+        const swapEthToUni = async (value) => {
+          const uni = await new Token(
+            chainId,
+            "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+            18,
+            "UNI",
+            "Uniswap"
+          );
           const weth = WETH9[chainId];
 
-          const pair = await Fetcher.fetchPairData(weth, wbnb, provider);
+          const pair = await Fetcher.fetchPairData(weth, uni, provider);
 
-          const route = new Route([pair], weth, wbnb);
+          const route = new Route([pair], weth, uni);
           const amountOut = value * 10 ** 18;
           const amount = CurrencyAmount.fromRawAmount(weth, amountOut);
           const trade = new Trade(route, amount, TradeType.EXACT_INPUT);
@@ -72,7 +80,7 @@
           const slippageTolerance = new Percent("50", "10000");
           const amountIn = trade.maximumAmountIn(slippageTolerance);
           const amountOutMin = trade.minimumAmountOut(slippageTolerance);
-          const path = [weth.address, wbnb.address];
+          const path = [weth.address, uni.address];
           const to = "";
           const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
           // const value = trade.inputAmount.raw;
@@ -87,21 +95,27 @@
         };
 
         const swapBnbToEth = async (value) => {
-          const wbnb = WBNB[chainId];
+          const uni = await new Token(
+            chainId,
+            "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+            18,
+            "UNI",
+            "Uniswap"
+          );
           const weth = WETH9[chainId];
 
-          const pair = await Fetcher.fetchPairData(wbnb, weth, provider);
+          const pair = await Fetcher.fetchPairData(uni, weth, provider);
 
-          const route = new Route([pair], wbnb, weth);
+          const route = new Route([pair], uni, weth);
           const amountOut = value * 10 ** 18;
-          const amount = CurrencyAmount.fromRawAmount(wbnb, amountOut);
+          const amount = CurrencyAmount.fromRawAmount(uni, amountOut);
           const trade = new Trade(route, amount, TradeType.EXACT_INPUT);
           const howMuchETH = route.midPrice.toSignificant(6);
 
           const slippageTolerance = new Percent("50", "10000");
           const amountIn = trade.maximumAmountIn(slippageTolerance);
           const amountOutMin = trade.minimumAmountOut(slippageTolerance);
-          const path = [wbnb.address, weth.address];
+          const path = [uni.address, weth.address];
           const to = "";
           const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
           // const value = trade.inputAmount.raw;
@@ -115,12 +129,12 @@
           };
         };
 
-        async function swapEthToBnbTransaction() {
+        async function swapEthToUniTransaction() {
           const web3 = new Web3(window.ethereum);
           const walletAdress = await getWallet();
 
           const uniContractRouterAdress =
-            "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+            "0xEfF92A263d31888d860bD50809A8D171709b7b1c";
           const uniContractRouterABI = [
             {
               constant: false,
@@ -162,7 +176,7 @@
 
           const value = parseFloat(inputSwap.value);
           const { howMuchBNB, path, deadline, amountIn, amountOutMin } =
-            await swapEthToBnb(value);
+            await swapEthToUni(value);
           const deadlineSwap = deadline;
           const pathSwap = path;
           const amountOutMinSwap = amountOutMin;
@@ -179,12 +193,12 @@
             });
         }
 
-        async function swapBnbToEthTransaction() {
+        async function swapUniToEthTransaction() {
           const web3 = new Web3(window.ethereum);
           const walletAdress = await getWallet();
 
           const uniContractRouterAdress =
-            "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+            "0xEfF92A263d31888d860bD50809A8D171709b7b1c";
           const uniContractRouterABI = [
             {
               constant: false,
@@ -210,7 +224,7 @@
                   type: "uint256",
                 },
               ],
-              name: "swapExactTokensForETH",
+              name: "swapExactTokensForTokens",
               outputs: [
                 {
                   name: "amounts",
@@ -236,8 +250,8 @@
           const pathSwap = path;
           const amountOutMinSwap = amountOutMin;
           await tuniContract.methods
-            .swapExactTokensForETH(
-              amountInSwap,
+            .swapExactTokensForTokens(
+              ethers.utils.parseEther(amountInSwap),
               ethers.utils.parseEther(amountOutMinSwap),
               pathSwap,
               walletAdress,
@@ -245,7 +259,53 @@
             )
             .send({
               from: walletAdress,
-              //   value: ethers.utils.parseEther(value.toString()),
+            });
+        }
+
+        async function approveUniToSwap() {
+          const web3 = new Web3(window.ethereum);
+          const walletAdress = await getWallet();
+
+          const approveContract = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
+          const approveContractAbi = [
+            {
+              constant: false,
+              inputs: [
+                {
+                  name: "spender",
+                  type: "address",
+                },
+                {
+                  name: "rawAmount",
+                  type: "uint256",
+                },
+              ],
+              name: "approve",
+              outputs: [
+                {
+                  name: "",
+                  type: "bool",
+                },
+              ],
+              payable: false,
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+          ];
+
+          const approveContractUni = new web3.eth.Contract(
+            approveContractAbi,
+            approveContract
+          );
+
+          const value = parseFloat(inputSwap.value);
+          await approveContractUni.methods
+            .approve(
+              "0xEfF92A263d31888d860bD50809A8D171709b7b1c",
+              web3.utils.toWei(value.toString(), "ether")
+            )
+            .send({
+              from: walletAdress,
             });
         }
 
@@ -278,58 +338,30 @@
         }
 
         async function getTokenBalanceETH() {
-          const web3 = new Web3("https://bsc-dataseed1.binance.org");
-          const tokenContractAddress =
-            "0x2170Ed0880ac9A755fd29B2688956BD959F933F8";
+          const web3 = new Web3("https://ethereum-goerli.publicnode.com");
           const wallets = await web3.eth.getAccounts();
           const waleetAdress = await getWallet();
 
-          const tokenContractABI = [
-            {
-              constant: true,
-              inputs: [
-                {
-                  name: "account",
-                  type: "address",
-                },
-              ],
-              name: "balanceOf",
-              outputs: [
-                {
-                  name: "",
-                  type: "uint256",
-                },
-              ],
-              payable: false,
-              stateMutability: "view",
-              type: "function",
-            },
-          ];
-
-          const tokenContract = new web3.eth.Contract(
-            tokenContractABI,
-            tokenContractAddress
-          );
-
           let balance;
           try {
-            let balance = await tokenContract.methods
-              .balanceOf(waleetAdress)
-              .call();
-
+            balance = await web3.eth.getBalance(waleetAdress);
+            const finalBalance = parseFloat(
+              web3.utils.fromWei(balance, "ether")
+            );
             const tokenElement = document.getElementById("tokenBalanceChange");
-            tokenElement.innerHTML = `${balance} ETH`;
+            tokenElement.innerHTML = `${finalBalance.toFixed(2)} ETH`;
           } catch (error) {
-            console.error("Ошибка при получении баланса токенов:", error);
+            console.error("Ошибка при получении баланса ETH:", error);
+            return null;
           }
 
           return balance;
         }
 
-        async function getTokenBalanceBNB() {
-          const web3 = new Web3("https://bsc-dataseed1.binance.org");
+        async function getTokenBalanceUni() {
+          const web3 = new Web3("https://ethereum-goerli.publicnode.com");
           const tokenContractAddress =
-            "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
+            "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
           const wallets = await web3.eth.getAccounts();
           const waleetAdress = await getWallet();
 
@@ -362,12 +394,13 @@
 
           let balance;
           try {
-            let balance = await tokenContract.methods
+            balance = await tokenContract.methods
               .balanceOf(waleetAdress)
               .call();
 
+            const finalBalance = balance / 10 ** 18;
             const tokenElement = document.getElementById("tokenBalanceChange");
-            tokenElement.innerHTML = `${balance} BNB`;
+            tokenElement.innerHTML = `${finalBalance.toFixed(2)} UNI`;
           } catch (error) {
             console.error("Ошибка при получении баланса токенов:", error);
           }
@@ -390,19 +423,90 @@
             });
         }
 
-        async function getPriceBnb(element) {
+        async function getPriceUni(element) {
           fetch(
-            "https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd"
+            "https://api.coingecko.com/api/v3/simple/price?ids=uniswap&vs_currencies=usd"
           )
             .then((response) => response.json())
             .then((data) => {
-              const bnbPrice = data.binancecoin.usd;
+              const uniPrice = data.uniswap.usd;
               const priceElement = document.getElementById(element);
-              priceElement.innerHTML = `${bnbPrice} $`;
+              priceElement.innerHTML = `${uniPrice} $`;
             })
             .catch((error) => {
-              console.error("Ошибка при получении цены BNB:", error);
+              console.error("Ошибка при получении цены UNI:", error);
             });
+        }
+
+        async function handleSwapButtonClick() {
+          const web3 = new Web3(window.ethereum);
+          const walletAdress = await getWallet();
+
+          const allowContract = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
+          const allowContractAbi = [
+            {
+              constant: true,
+              inputs: [
+                {
+                  name: "account",
+                  type: "address",
+                },
+                {
+                  name: "spender",
+                  type: "address",
+                },
+              ],
+              name: "allowance",
+              outputs: [
+                {
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              payable: false,
+              stateMutability: "view",
+              type: "function",
+            },
+          ];
+
+          const approveContractUni = new web3.eth.Contract(
+            allowContractAbi,
+            allowContract
+          );
+
+          const value = parseFloat(inputSwap.value);
+          const finalvalue = value * 10 ** 18;
+          const allowFirst = await approveContractUni.methods
+            .allowance(
+              walletAdress,
+              "0xEfF92A263d31888d860bD50809A8D171709b7b1c"
+            )
+            .send({
+              from: walletAdress,
+            });
+
+          if (allowFirst >= finalvalue) {
+            await swapUniToEthTransaction();
+          } else {
+            await approveUniToSwap();
+            const allowSecond = await approveContractUni.methods
+              .allowance(
+                walletAdress,
+                "0xEfF92A263d31888d860bD50809A8D171709b7b1c"
+              )
+              .send({
+                from: walletAdress,
+              });
+
+            if (allowSecond >= finalvalue && allowFirst < finalvalue) {
+              await swapUniToEthTransaction();
+            } else if (allowSecond < finalvalue) {
+              alert(
+                "Вы не обобрили нужное колличество токенов, введите в поле необходимое колличество для стейкинга"
+              );
+              await approveUniToSwap();
+            }
+          }
         }
 
         $(document).ready(function () {
@@ -488,28 +592,33 @@
               $(".swap-block-item-selector").find("#toText").text("");
               $(".swap-block-item-selector")
                 .find("#toText")
-                .prepend(`<span>BNB</span>`);
+                .prepend(`<span>UNI</span>`);
               $(".swap-block-item-selector")
                 .find("#toText")
                 .prepend(`<img src="img/swap-block-item-1.png" alt="">`);
               getPriceEth("changePrice");
-              // swapButton.addEventListener("click", swapEthToBnbTransaction);
+              getTokenBalanceETH();
+              // swapButton.addEventListener("click", swapEthToUniTransaction);
               // getTokenBalanceETH();
               inputElement.addEventListener("input", async function (event) {
                 const value = parseFloat(inputSwap.value);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
                 const { howMuchBNB, path, deadline, amountIn, amountOutMin } =
-                  await swapEthToBnb(value);
+                  await swapEthToUni(value);
                 const finalValue = value * howMuchBNB;
                 outputSwap.value = finalValue.toFixed(2);
-                const balance = getTokenBalanceETH();
+                const balance = await getTokenBalanceETH();
+                console.log(balance);
+                console.log(value);
                 if (value <= balance) {
-                  swapButton.addEventListener("click", swapEthToBnbTransaction);
+                  swapButton.addEventListener("click", swapEthToUniTransaction);
                 } else {
                   alert("Недостаточно средств для обмена");
                 }
               });
-            } else {
+            } else if (
+              `${$(this).find(".swap-tokens-block-item-text").text()}` == "UNI"
+            ) {
               $(".swap-block-item-selector").find("#toText").text("");
               $(".swap-block-item-selector")
                 .find("#toText")
@@ -517,8 +626,9 @@
               $(".swap-block-item-selector")
                 .find("#toText")
                 .prepend(`<img src="img/swap-block-item-0.png" alt="">`);
-              getPriceBnb("changePrice");
-              // swapButton.addEventListener("click", swapBnbToEthTransaction);
+              getPriceUni("changePrice");
+              getTokenBalanceUni();
+              // swapButton.addEventListener("click", swapUniToEthTransaction);
               // getTokenBalanceBNB();
               inputElement.addEventListener("input", async function (event) {
                 const value = parseFloat(inputSwap.value);
@@ -527,8 +637,9 @@
                   await swapBnbToEth(value);
                 const finalValue = value * howMuchETH;
                 outputSwap.value = finalValue.toFixed(2);
+                const balance = await getTokenBalanceUni();
                 if (value <= balance) {
-                  swapButton.addEventListener("click", swapBnbToEthTransaction);
+                  swapButton.addEventListener("click", handleSwapButtonClick);
                 } else {
                   alert("Недостаточно средств для обмена");
                 }
@@ -28201,12 +28312,12 @@ function unoddify(value: BytesLike | Hexable | number): BytesLike | Hexable | nu
             "https://ethereum.org"
           ),
         };
-        var WBNB = {
+        var uni = {
           [1 /* ETHEREUM */]: new ERC20Token(
             1 /* ETHEREUM */,
             "0x418D75f65a02b3D53B2418FB8E1fe493759c7605",
             18,
-            "WBNB",
+            "uni",
             "Wrapped BNB",
             "https://www.binance.org"
           ),
@@ -28214,7 +28325,7 @@ function unoddify(value: BytesLike | Hexable | number): BytesLike | Hexable | nu
             56 /* BSC */,
             "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
             18,
-            "WBNB",
+            "uni",
             "Wrapped BNB",
             "https://www.binance.org"
           ),
@@ -28222,7 +28333,7 @@ function unoddify(value: BytesLike | Hexable | number): BytesLike | Hexable | nu
             97 /* BSC_TESTNET */,
             "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
             18,
-            "WBNB",
+            "uni",
             "Wrapped BNB",
             "https://www.binance.org"
           ),
@@ -28230,8 +28341,8 @@ function unoddify(value: BytesLike | Hexable | number): BytesLike | Hexable | nu
         var WNATIVE = {
           [1 /* ETHEREUM */]: WETH9[1 /* ETHEREUM */],
           [5 /* GOERLI */]: WETH9[5 /* GOERLI */],
-          [56 /* BSC */]: WBNB[56 /* BSC */],
-          [97 /* BSC_TESTNET */]: WBNB[97 /* BSC_TESTNET */],
+          [56 /* BSC */]: uni[56 /* BSC */],
+          [97 /* BSC_TESTNET */]: uni[97 /* BSC_TESTNET */],
         };
         var NATIVE = {
           [1 /* ETHEREUM */]: { name: "Ether", symbol: "ETH", decimals: 18 },
@@ -29952,7 +30063,7 @@ function unoddify(value: BytesLike | Hexable | number): BytesLike | Hexable | nu
         exports.Route = Route;
         exports.Router = Router;
         exports.Trade = Trade;
-        exports.WBNB = WBNB;
+        exports.uni = uni;
         exports.WETH9 = WETH9;
         exports.WNATIVE = WNATIVE;
         exports.ZERO_PERCENT = ZERO_PERCENT;

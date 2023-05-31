@@ -5,23 +5,23 @@ fetch(
   .then((data) => {
     const ethPrice = data.ethereum.usd;
     const priceElement = document.getElementById("ethPrice");
-    priceElement.innerHTML = `${ethPrice} $`;
+    priceElement.innerHTML = `${ethPrice.toFixed(0)} $`;
   })
   .catch((error) => {
     console.error("Ошибка при получении цены ETH:", error);
   });
 
 fetch(
-  "https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd"
+  "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
 )
   .then((response) => response.json())
   .then((data) => {
-    const bnbPrice = data.binancecoin.usd;
+    const btcPrice = data.bitcoin.usd;
     const priceElement = document.getElementById("bnbPrice");
-    priceElement.innerHTML = `${bnbPrice} $`;
+    priceElement.innerHTML = `${btcPrice} $`;
   })
   .catch((error) => {
-    console.error("Ошибка при получении цены BNB:", error);
+    console.error("Ошибка при получении цены BTC:", error);
   });
 
 async function getWallet() {
@@ -48,8 +48,8 @@ async function getWallet() {
 }
 
 async function getTokenBalance() {
-  const web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545");
-  const tokenContractAddress = "0x45D283fD00C0cBEcE8D44a273410891492de3F88";
+  const web3 = new Web3("https://ethereum-goerli.publicnode.com");
+  const tokenContractAddress = "0x04fc7A2010CA634a940b8cdF80c58d2d01c1ebdD";
   const wallets = await web3.eth.getAccounts();
   const waleetAdress = await getWallet();
 
@@ -213,9 +213,9 @@ async function getTokenBalance() {
     if (balanceFinalLength > 12) {
       tokenElement.innerHTML = `${balance.substring(0, 4)}...${balance.slice(
         -4
-      )} PeppaAI`;
+      )} WX`;
     } else {
-      tokenElement.innerHTML = `${balanceFinal} PeppaAI`;
+      tokenElement.innerHTML = `${balanceFinal} WX`;
     }
   } catch (error) {
     console.error("Ошибка при получении баланса токенов:", error);

@@ -6,7 +6,7 @@ const rangeValues = document.querySelectorAll(".staking-pool-range-value");
 
 slider.addEventListener("input", async function () {
   const tokenContract = await getTokenContract(
-    "https://data-seed-prebsc-1-s1.binance.org:8545"
+    "https://ethereum-goerli.publicnode.com"
   );
   const waleetAdress = await getWallet();
 
@@ -21,7 +21,7 @@ slider.addEventListener("input", async function () {
 
 slider2.addEventListener("input", async function () {
   const stakeContract = await getContract(
-    "https://data-seed-prebsc-1-s1.binance.org:8545"
+    "https://ethereum-goerli.publicnode.com"
   );
   const waleetAdress = await getWallet();
   const balanceStakingUser = await stakeContract.methods
@@ -70,7 +70,7 @@ async function getWallet() {
 
 async function getTokenContract(web3provider) {
   const web3 = new Web3(web3provider);
-  const tokenContractAddress = "0x45D283fD00C0cBEcE8D44a273410891492de3F88";
+  const tokenContractAddress = "0x04fc7A2010CA634a940b8cdF80c58d2d01c1ebdD";
 
   const tokenContractABI = [
     { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -108,12 +108,7 @@ async function getTokenContract(web3provider) {
           name: "from",
           type: "address",
         },
-        {
-          indexed: true,
-          internalType: "address",
-          name: "to",
-          type: "address",
-        },
+        { indexed: true, internalType: "address", name: "to", type: "address" },
         {
           indexed: false,
           internalType: "uint256",
@@ -161,11 +156,7 @@ async function getTokenContract(web3provider) {
     {
       inputs: [
         { internalType: "address", name: "spender", type: "address" },
-        {
-          internalType: "uint256",
-          name: "subtractedValue",
-          type: "uint256",
-        },
+        { internalType: "uint256", name: "subtractedValue", type: "uint256" },
       ],
       name: "decreaseAllowance",
       outputs: [{ internalType: "bool", name: "", type: "bool" }],
@@ -238,7 +229,7 @@ async function getTokenBalance() {
   const wallets = await web3.eth.getAccounts();
   const waleetAdress = await getWallet();
   const tokenContract = await getTokenContract(
-    "https://data-seed-prebsc-1-s1.binance.org:8545"
+    "https://ethereum-goerli.publicnode.com"
   );
 
   try {
@@ -255,7 +246,7 @@ getTokenBalance();
 
 async function getContract(web3provider) {
   const web3 = new Web3(web3provider);
-  const stakeContractAddress = "0xDF7C013E57A2577b2027e285aB1B4615946A7Ba0";
+  const stakeContractAddress = "0x4C182B9B26a7C5Fe5E27D8827F162D2632957549";
 
   const stakeContractABI = [
     {
@@ -415,7 +406,7 @@ async function getContract(web3provider) {
 
 async function getStaking() {
   const stakeContract = await getContract(
-    "https://data-seed-prebsc-1-s1.binance.org:8545"
+    "https://ethereum-goerli.publicnode.com"
   );
   const waleetAdress = await getWallet();
   try {
@@ -460,6 +451,7 @@ $("#confirmButton").click(function () {
 });
 
 async function stakingFunction() {
+  web3 = new Web3(window.ethereum);
   const stakeContract = await getContract(window.ethereum);
   const tokenContract = await getTokenContract(window.ethereum);
   const waleetAdress = await getWallet();
@@ -477,25 +469,31 @@ async function stakingFunction() {
         .call();
       if (allowanceFirst >= finalvalue) {
         await stakeContract.methods
-          .deposit(finalvalue.toString())
+          .deposit(web3.utils.toWei(value.toString(), "ether")) // finalvalue.toString()
           .send({ from: waleetAdress });
       } else {
         await tokenContract.methods
-          .approve(stakeContract.options.address, value)
+          .approve(
+            stakeContract.options.address,
+            web3.utils.toWei(value.toString(), "ether")
+          )
           .send({ from: waleetAdress });
         const allowanceSecond = await tokenContract.methods
           .allowance(waleetAdress, stakeContract.options.address)
           .call();
         if (allowanceSecond >= finalvalue && allowanceFirst < finalvalue) {
           await stakeContract.methods
-            .deposit(finalvalue.toString())
+            .deposit(web3.utils.toWei(value.toString(), "ether"))
             .send({ from: waleetAdress });
         } else if (allowanceSecond < value) {
           alert(
             "Вы не обобрили нужное колличество токенов, введите в поле необходимое колличество для стейкинга"
           );
           await tokenContract.methods
-            .approve(stakeContract.options.address, value)
+            .approve(
+              stakeContract.options.address,
+              web3.utils.toWei(value.toString(), "ether")
+            )
             .send({ from: waleetAdress });
         }
       }
@@ -528,25 +526,31 @@ async function unstakingFunction() {
         .call();
       if (allowanceFirst >= value) {
         await stakeContract.methods
-          .withdraw(finalvalue.toString())
+          .withdraw(web3.utils.toWei(value.toString(), "ether"))
           .send({ from: waleetAdress });
       } else {
         await tokenContract.methods
-          .approve(stakeContract.options.address, value)
+          .approve(
+            stakeContract.options.address,
+            web3.utils.toWei(value.toString(), "ether")
+          )
           .send({ from: waleetAdress });
         const allowanceSecond = await tokenContract.methods
           .allowance(waleetAdress, stakeContract.options.address)
           .call();
         if (allowanceSecond >= value && allowanceFirst < value) {
           await stakeContract.methods
-            .withdraw(finalvalue.toString())
+            .withdraw(web3.utils.toWei(value.toString(), "ether"))
             .send({ from: waleetAdress });
         } else if (allowanceSecond < value) {
           alert(
             "Вы не обобрили нужное колличество токенов, введите в поле необходимое колличество для стейкинга"
           );
           await tokenContract.methods
-            .approve(stakeContract.options.address, value)
+            .approve(
+              stakeContract.options.address,
+              web3.utils.toWei(value.toString(), "ether")
+            )
             .send({ from: waleetAdress });
         }
       }
@@ -562,7 +566,10 @@ async function unstakingFunction() {
         await stakeContract.methods.withdrawAll().send({ from: waleetAdress });
       } else {
         await tokenContract.methods
-          .approve(stakeContract.options.address, value)
+          .approve(
+            stakeContract.options.address,
+            web3.utils.toWei(value.toString(), "ether")
+          )
           .send({ from: waleetAdress });
         const allowanceSecond = await tokenContract.methods
           .allowance(waleetAdress, stakeContract.options.address)
@@ -576,7 +583,10 @@ async function unstakingFunction() {
             "Вы не обобрили нужное колличество токенов, введите в поле необходимое колличество для стейкинга"
           );
           await tokenContract.methods
-            .approve(stakeContract.options.address, value)
+            .approve(
+              stakeContract.options.address,
+              web3.utils.toWei(value.toString(), "ether")
+            )
             .send({ from: waleetAdress });
         }
       }

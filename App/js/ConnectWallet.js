@@ -42,7 +42,7 @@ async function myFunction() {
   try {
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0x61" }], // 0x38
+      params: [{ chainId: "0x5" }],
     });
     console.log("Вы переключились на нужную сеть");
   } catch (switchError) {
@@ -53,13 +53,13 @@ async function myFunction() {
           method: "wallet_addEthereumChain",
           params: [
             {
-              chainId: "0x38",
-              chainName: "Binance Smart Chain",
-              rpcUrls: ["https://bsc-dataseed.binance.org/"],
-              blockExplorerUrls: ["https://bscscan.com/"],
+              chainId: "0x5",
+              chainName: "Goerli",
+              rpcUrls: ["https://ethereum-goerli.publicnode.com"],
+              blockExplorerUrls: ["https://goerli.etherscan.io/"],
               nativeCurrency: {
-                name: "BNB",
-                symbol: "BNB",
+                name: "ETH",
+                symbol: "ETH",
                 decimals: 18,
               },
             },
