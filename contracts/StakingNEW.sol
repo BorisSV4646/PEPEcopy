@@ -73,7 +73,7 @@ contract StakingWinX is ReentrancyGuard, Ownable {
             "Can't stake more than you own"
         );
 
-        // !необходимо выдать апрув данному контракту перед стейкингом
+        // !It is necessary to issue an approve to this contract before staking
         rewardsToken.transferFrom(msg.sender, address(this), _amount);
 
         if (stakers[msg.sender].deposited == 0) {
@@ -91,14 +91,13 @@ contract StakingWinX is ReentrancyGuard, Ownable {
             stakers[msg.sender].deposited += _amount;
             stakers[msg.sender].timeOfLastUpdate = block.timestamp;
             totalStaked += _amount;
-            // stakers[msg.sender].startStaking = block.timestamp;
         }
 
         emit Stake(msg.sender, _amount);
     }
 
     // Mints rewards for msg.sender
-    function claimRewards() external nonReentrant {
+    function claimRewards() public nonReentrant {
         Staker storage staker = stakers[msg.sender];
 
         uint256 rewards = calculateRewards(msg.sender) +
@@ -124,18 +123,13 @@ contract StakingWinX is ReentrancyGuard, Ownable {
         rewardsToken.transfer(msg.sender, rewards);
     }
 
-    function withdraw(uint256 _amount) external nonReentrant {
+    function withdraw(uint256 _amount) external {
         require(
             stakers[msg.sender].deposited >= _amount,
             "You have not enough deposit"
         );
-        uint256 rewards = calculateRewards(msg.sender) +
-            stakers[msg.sender].unclaimedRewards;
-        stakers[msg.sender].unclaimedRewards = 0;
+        claimRewards();
         stakers[msg.sender].deposited -= _amount;
-        stakers[msg.sender].timeOfLastUpdate = block.timestamp;
-
-        uint256 amounwithdraw = _amount + rewards;
 
         uint256 comission;
 
@@ -146,24 +140,20 @@ contract StakingWinX is ReentrancyGuard, Ownable {
             comission = 0;
         }
 
-        rewardsToken.transfer(msg.sender, amounwithdraw - comission);
+        rewardsToken.transfer(msg.sender, _amount - comission);
 
         totalStaked -= _amount;
 
-        emit Withdraw(msg.sender, amounwithdraw);
+        emit Withdraw(msg.sender, _amount);
     }
 
     // Withdraw specified amount of staked tokens
-    function withdrawAll() external nonReentrant {
+    function withdrawAll() external {
         require(stakers[msg.sender].deposited > 0, "You have no deposit");
-        uint256 rewards = calculateRewards(msg.sender) +
-            stakers[msg.sender].unclaimedRewards;
+        claimRewards();
         uint256 _deposit = stakers[msg.sender].deposited;
-        stakers[msg.sender].unclaimedRewards = 0;
         stakers[msg.sender].deposited = 0;
         stakers[msg.sender].timeOfLastUpdate = 0;
-
-        uint256 amounwithdraw = _deposit + rewards;
 
         uint256 comission;
 
@@ -174,11 +164,11 @@ contract StakingWinX is ReentrancyGuard, Ownable {
             comission = 0;
         }
 
-        rewardsToken.transfer(msg.sender, amounwithdraw - comission);
+        rewardsToken.transfer(msg.sender, _deposit - comission);
 
         totalStaked -= _deposit;
 
-        emit Withdraw(msg.sender, amounwithdraw);
+        emit Withdraw(msg.sender, _deposit);
     }
 
     // Function useful for fron-end that returns user stake and rewards by address
@@ -252,7 +242,7 @@ contract StakingWinX is ReentrancyGuard, Ownable {
         rewardsToken.transfer(to, balance);
     }
 
-    //!необходимо запустить скрипт, который каждый день будет обновлять пул наград
+    // !You need to run a script that will update the reward pool every day
     function changeDay() external onlyOwner {
         require(dayTime >= 1 days, "Day is not end");
         dayTime = block.timestamp;
