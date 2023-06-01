@@ -114,12 +114,13 @@ contract StakingWinX is ReentrancyGuard, Ownable {
 
         if (staker.referal != address(0)) {
             rewardsToken.transfer(stakers[msg.sender].referal, refReward);
+            rewardsToken.transfer(burnable, comissionWithRef);
             rewards -= (refReward + comissionWithRef);
         } else {
             rewards -= comission;
+            rewardsToken.transfer(burnable, comission);
         }
 
-        rewardsToken.transfer(burnable, comission);
         rewardsToken.transfer(msg.sender, rewards);
     }
 
@@ -147,7 +148,7 @@ contract StakingWinX is ReentrancyGuard, Ownable {
 
         rewardsToken.transfer(msg.sender, amounwithdraw - comission);
 
-        totalStaked -= amounwithdraw;
+        totalStaked -= _amount;
 
         emit Withdraw(msg.sender, amounwithdraw);
     }
@@ -175,7 +176,7 @@ contract StakingWinX is ReentrancyGuard, Ownable {
 
         rewardsToken.transfer(msg.sender, amounwithdraw - comission);
 
-        totalStaked -= amounwithdraw;
+        totalStaked -= _deposit;
 
         emit Withdraw(msg.sender, amounwithdraw);
     }
@@ -197,7 +198,7 @@ contract StakingWinX is ReentrancyGuard, Ownable {
         if (daysStaked >= 60) return rewardMultiplier.days60;
         if (daysStaked >= 45) return rewardMultiplier.days45;
         if (daysStaked >= 30) return rewardMultiplier.days30;
-        return 0;
+        return 1;
     }
 
     function calculateRewards(address _staker) internal returns (uint256) {
