@@ -32,7 +32,7 @@ contract StakingWinX is ReentrancyGuard, Ownable {
 
     address private burnable;
 
-    // Rewards per hour. A fraction calculated as x/10.000.000 to get the percentage
+    // Rewards per hour.A fraction calculated as x/10.000.000 to get the percentage
     uint256 public rewardsPerHour; // 0.0416%/h or 1%/day
     uint256 public minStake = 1 * 10 ** 18;
     uint256 private maxRewardDay;
